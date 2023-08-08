@@ -2,19 +2,8 @@ import random
 import string
 
 
-def load_definitions(top_lvl_schema):
-    closures = {}
-    match top_lvl_schema:
-        case {"definitions": definitions, **rest}:
-            for name, schema in definitions.items():
-                closures[f"#/definitions/{name}"] = make_generator(
-                    schema=schema, definitions=closures
-                )
-    return closures
-
-
 def make_generator(
-    schema,
+    top_lvl_schema,
     arr_min_items=0,
     arr_max_items=32,
     num_min_val=0,
@@ -24,8 +13,14 @@ def make_generator(
     str_len=8,
     definitions={},
 ):
-    def compile(_schema):
-        match _schema:
+    def load_definitions(schema):
+        match schema:
+            case {"definitions": schemas, **rest}:
+                for name, schema in schemas.items():
+                    definitions[f"#/definitions/{name}"] = compile(schema)
+
+    def compile(schema):
+        match schema:
             case {"$ref": definition_path}:
                 return lambda: definitions[definition_path]()
             case {"anyOf": [*choices], **rest}:
@@ -80,6 +75,12 @@ def make_generator(
             case {"type": "null", **rest}:
                 return lambda: None
             case _:
-                raise NotImplementedError(_schema)
+                """
+                I really want to raise some error here, but I have schemas that looks like:
+                    payload": { "description": "msgpack bytes" },
+                So there are nothing actionable here, nor any pattern that I can use
+                """
+                return lambda: {}
 
-    return compile(schema)
+    load_definitions(top_lvl_schema)
+    return compile(top_lvl_schema)
