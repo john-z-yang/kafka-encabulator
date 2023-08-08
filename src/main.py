@@ -1,6 +1,11 @@
 import json
+import pprint
 import sys
 from generator import make_generator
+
+"""
+parameterize msg/s
+"""
 
 
 def main():

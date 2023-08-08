@@ -1,7 +1,9 @@
 import json
-import os
+import jsonschema
 import pytest
+import os
 from src.generator import make_generator
+
 
 SCHEMA_FILES = [
     "events.v1.schema.json",
@@ -20,17 +22,20 @@ SCHEMA_FILES = [
     "transactions.v1.schema.json",
 ]
 
+SCHEMA_PATHS = [
+    f"{os.path.dirname(__file__)}/../lib/schemas/{schema_file}"
+    for schema_file in SCHEMA_FILES
+]
+
 
 @pytest.mark.parametrize(
     "schema_path",
-    [
-        f"{os.path.dirname(__file__)}/../lib/schemas/{schema_file}"
-        for schema_file in SCHEMA_FILES
-    ],
+    SCHEMA_PATHS,
 )
-def test_generate_schema(schema_path):
+def test_generated_schema_is_valid(schema_path):
     with open(schema_path) as f:
         schema = json.loads(f.read())
         generator = make_generator(top_lvl_schema=schema)
-        for _ in range(8192):
-            generator()
+        for _ in range(256):
+            msg = generator()
+            jsonschema.validate(instance=msg, schema=schema)

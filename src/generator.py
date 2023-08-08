@@ -1,5 +1,7 @@
 import random
 import string
+import rstr
+import re
 
 
 def make_generator(
@@ -27,11 +29,27 @@ def make_generator(
                 closures = [compile(choice) for choice in choices]
                 return lambda: random.choice(closures)()
             case {"type": "object", **rest}:
-                closures = {
+                prop_closures = {
                     key: compile(sub_schema)
                     for key, sub_schema in rest.get("properties", {}).items()
                 }
-                return lambda: {key: closure() for key, closure in closures.items()}
+                pattern_prop_closures = [
+                    lambda: {rstr.xeger(re.compile(pattern)): closure()}
+                    for pattern, closure in [
+                        (pattern, compile(sub_schema))
+                        for pattern, sub_schema in rest.get(
+                            "patternProperties", {}
+                        ).items()
+                    ]
+                ]
+                return lambda: {
+                    pattern_prop: val
+                    for d in (
+                        [{key: closure() for key, closure in prop_closures.items()}]
+                        + [closure() for closure in pattern_prop_closures]
+                    )
+                    for pattern_prop, val in d.items()
+                }
             case {"type": "array", "items": [*sub_schemas], **rest}:
                 closures = [compile(sub_schema) for sub_schema in sub_schemas]
                 return lambda: [closure() for closure in closures]
@@ -64,6 +82,8 @@ def make_generator(
                 return lambda: random.randint(
                     rest.get("minimum", num_min_val), rest.get("maximum", num_max_val)
                 )
+            case {"type": "string", "pattern": pattern, **rest}:
+                return lambda: rstr.xeger(re.compile(pattern))
             case {"type": "string", "enum": [*enums], **rest}:
                 return lambda: random.choice(enums)
             case {"type": "string", **rest}:
