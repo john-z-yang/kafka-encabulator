@@ -1,6 +1,8 @@
 import json
 import os
+
 import pytest
+
 from src.generator import make_generator
 
 SCHEMA_FILES = [

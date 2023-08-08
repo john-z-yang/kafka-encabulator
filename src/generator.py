@@ -1,7 +1,8 @@
 import random
-import string
-import rstr
 import re
+import string
+
+import rstr
 
 
 def make_generator(
@@ -69,10 +70,6 @@ def make_generator(
             case {"type": [*choices], **rest}:
                 closures = [compile({"type": choice, **rest}) for choice in choices]
                 return lambda: random.choice(closures)()
-            case {"const": const, **rest}:
-                return lambda: const
-            case {"default": const, **rest}:
-                return lambda: const
             case {"type": "number", **rest}:
                 return lambda: random.uniform(
                     rest.get("minimum", float_min_val),
@@ -92,6 +89,8 @@ def make_generator(
                 )
             case {"type": "boolean", **rest}:
                 return lambda: random.choice((True, False))
+            case {"const": const, **rest} | {"default": const, **rest}:
+                return lambda: const
             case {"type": "null", **rest}:
                 return lambda: None
             case _:

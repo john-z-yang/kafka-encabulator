@@ -1,9 +1,10 @@
 import json
+import os
+
 import jsonschema
 import pytest
-import os
-from src.generator import make_generator
 
+from src.generator import make_generator
 
 SCHEMA_FILES = [
     "events.v1.schema.json",
