@@ -1,8 +1,6 @@
-from collections import OrderedDict
 import json
 import sys
 from generator import make_generator
-import pprint
 
 
 def main():
