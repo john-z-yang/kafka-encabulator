@@ -43,13 +43,35 @@ Python script that generates random JSONs base on JSON schema.
 ```
 
 ```bash
-➜  kafka-encabulator git:(main) ✗ python src/main.py schema.json
-[2, {"id": "AB6f1b6A2BECfBbaBa3d35cd73dA7952", "xyz": 3}, false]
+➜  kafka-encabulator git:(cli) ✗ python src/main.py --path schema.json --count 8
+null
+[2, {"id": "aEBDba6BbBa9800f68ed02fa0cfCecc6", "xyz": 8}, true]
+false
+[2, {"id": "4769bf9a7CC4f7a4cEa7CdD0bcFEBa98", "xyz": null}, null]
+[2, {"id": "ad07c6FD3aEfeF72cE6eDbda101aFcE7", "xyz": null}, null]
+[2, {"id": "668c14f2bAC85df30834BcFDAC8476Df", "xyz": 0}, null]
+[2, {"id": "aDAD79dbAeB0B20ab6241BFb99f8eBAd", "xyz": null}, false]
+null
 ```
 
 ## Getting Started
 
-Top-level Makefile synopsis:
+Usage
+
+```
+Usage: main.py [OPTIONS]
+
+Options:
+  --path PATH             The file path of the JSON schema (mutually exclusive
+                          with --schema).
+  --schema TEXT           The JSON schema. (mutually exclusive with --path).
+  --count INTEGER         Number of JSON objects to produce.
+  --kafka <TEXT TEXT>...  The kafka server and topic.
+  --help                  Show this message and exit.
+```
+
+Top-level Makefile synopsis
+
 ```
     make         - setup requirements
     make steup   - same as above

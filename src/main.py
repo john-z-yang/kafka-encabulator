@@ -25,9 +25,9 @@ def generate(generator, count, produce):
     not_required_if=["schema"],
     help="The file path of the JSON schema",
 )
-@click.option("--schema", cls=Mutex, not_required_if=["path"], help="The JSON schema")
-@click.option("--count", default=1, help="Number of JSON objects to produce")
-@click.option("--kafka", type=(str, str), help="The kafka server and topic")
+@click.option("--schema", cls=Mutex, not_required_if=["path"], help="The JSON schema.")
+@click.option("--count", default=1, help="Number of JSON objects to produce.")
+@click.option("--kafka", type=(str, str), help="The kafka server and topic.")
 def main(path, schema, count, kafka):
     if path:
         with open(path) as f:

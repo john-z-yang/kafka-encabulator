@@ -7,7 +7,7 @@ class Mutex(click.Option):
 
         assert self.not_required_if, "'not_required_if' parameter required"
         kwargs["help"] = (
-            f"{kwargs.get('help', '')} (this option is mutually exclusive with {', '.join(self.not_required_if)})"
+            f"{kwargs.get('help', '')} (mutually exclusive with {', '.join([f'--{opt}' for opt in self.not_required_if])})."
         ).strip()
         super(Mutex, self).__init__(*args, **kwargs)
 
@@ -18,7 +18,7 @@ class Mutex(click.Option):
         ]
         if self_is_present and others_present:
             raise click.UsageError(
-                f"Illegal usage: '{str(self.name)}' is mutually exclusive with {', '.join(others_present)}"
+                f"Illegal usage: --{str(self.name)} is mutually exclusive with {', '.join([f'--{opt}' for opt in self.not_required_if])}"
             )
         if self_is_present or others_present:
             self.prompt = None
