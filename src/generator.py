@@ -47,7 +47,8 @@ def make_generator(
             case {"type": "string", **options}:
                 match options:
                     case {"pattern": pattern, **rest}:
-                        return lambda: rstr.xeger(re.compile(pattern))
+                        rgx = re.compile(pattern)
+                        return lambda: rstr.xeger(rgx)
                     case {"enum": [*enums], **rest}:
                         return lambda: random.choice(enums)
                     case _:
@@ -106,9 +107,9 @@ def make_generator(
                     for key, sub_schema in rest.get("properties", {}).items()
                 }
                 pattern_prop_closures = [
-                    lambda: {rstr.xeger(re.compile(pattern)): closure()}
+                    lambda: {rstr.xeger(pattern): closure()}
                     for pattern, closure in [
-                        (pattern, compile(sub_schema))
+                        (re.compile(pattern), compile(sub_schema))
                         for pattern, sub_schema in rest.get(
                             "patternProperties", {}
                         ).items()
