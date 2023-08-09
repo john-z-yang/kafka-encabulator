@@ -1,5 +1,6 @@
 import json
 import os
+import random
 
 import pytest
 
@@ -31,6 +32,7 @@ SCHEMA_FILES = [
     ],
 )
 def test_generate_schema(schema_path):
+    random.seed(0)
     with open(schema_path) as f:
         schema = json.loads(f.read())
         generator = make_generator(top_lvl_schema=schema)

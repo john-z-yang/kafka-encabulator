@@ -7,7 +7,7 @@ class Mutex(click.Option):
 
         assert self.not_required_if, "'not_required_if' parameter required"
         kwargs["help"] = (
-            f"{kwargs.get('help', '')} (mutually exclusive with {', '.join([f'--{opt}' for opt in self.not_required_if])})."
+            f"{kwargs.get('help', '')} (Mutually exclusive with {', '.join([f'--{opt}' for opt in self.not_required_if])})"
         ).strip()
         super(Mutex, self).__init__(*args, **kwargs)
 
