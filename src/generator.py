@@ -31,8 +31,6 @@ def make_generator(
             #
             # If we match any of these, our closure simply emits a single
             # primitive, and we're done.
-            case {"const": const, **rest} | {"default": const, **rest}:
-                return lambda: const
             case {"type": "null", **rest}:
                 return lambda: None
             case {"type": "boolean", **rest}:
@@ -57,6 +55,12 @@ def make_generator(
                             random.choices(string.ascii_uppercase, k=str_len)
                         )
 
+            # Constants:
+            #     "const": const
+            # Trivially emit the constant.
+            case {"const": const, **rest}:
+                return lambda: const
+
             # References:
             #     "$ref": definition_path
             #
@@ -69,12 +73,12 @@ def make_generator(
                 return lambda: definitions[definition_path]()
 
             # Boolean algebraics:
-            #     "anyOf": [typename (, typename)*]
-            #     "type": [typename (, typename)*]
+            #     "anyOf": [ typename* ]
+            #     "type": [ typename* ]
             #
-            # Trivially emit a single value randomly from the choices. Which
-            # means we need to compile all of the choices during compile time,
-            # and have the closure call one randomly when it is invoked.
+            # Emit a single value randomly from the choices. This means we need
+            # to compile all of the choices during compile time, and have the
+            # closure call one randomly when it is invoked.
             case {"anyOf": [*choices], **rest}:
                 closures = [compile(choice) for choice in choices]
                 return lambda: random.choice(closures)()
@@ -83,10 +87,19 @@ def make_generator(
                 return lambda: random.choice(closures)()
 
             # Compound entities:
-            #     "type": "object" | "array"
-            #
-            # Our closure needs to construct the correct entity when called,
-            # so we compile the subschemas, and generate the dic/list.
+            #     {
+            #       "type": "object",
+            #       "properties": { (key: sub_schema)* }
+            #       "patternProperties": { (pattern: sub_schema)* }
+            #       ...
+            #     } | {
+            #       "type": "array",
+            #       "items": ([sub_schema*] | sub_schema)
+            #       ...
+            #     }
+            # Our closure needs to construct the correct entity when called, so
+            # we compile the subschemas into closures, and generate the dic/list
+            # by calling them.
             case {"type": "object", **rest}:
                 prop_closures = {
                     key: compile(sub_schema)
@@ -127,6 +140,15 @@ def make_generator(
                         ]
                     case _:
                         return lambda: []
+
+            # Default value:
+            #     "default": value
+            #
+            # We're not able to pattern match anything, so we fallback to the
+            # default value if it exists. This is in the end because we want to
+            # generate random values if possible.
+            case {"default": value, **rest}:
+                return lambda: value
 
             case _:
                 logging.warning(
