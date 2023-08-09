@@ -26,6 +26,11 @@ def make_generator(
 
     def compile(schema):
         match schema:
+            # Atomics:
+            #     "type": ("null" | "boolean" | "integer" | "number" | "string")
+            #
+            # If we match any of these, our closure simply emits a single
+            # primitive, and we're done.
             case {"const": const, **rest} | {"default": const, **rest}:
                 return lambda: const
             case {"type": "null", **rest}:
@@ -52,9 +57,24 @@ def make_generator(
                             random.choices(string.ascii_uppercase, k=str_len)
                         )
 
+            # References:
+            #     "$ref": definition_path
+            #
+            # Trivially call the closure at the definition_path and forward
+            # its result. It's imperative that we access values within
+            # the definitions dict during run-time instead of compile-time,
+            # because the closure corrosponding to that defintion may not
+            # have been compiled yet.
             case {"$ref": definition_path}:
                 return lambda: definitions[definition_path]()
 
+            # Boolean algebraics:
+            #     "anyOf": [typename (, typename)*]
+            #     "type": [typename (, typename)*]
+            #
+            # Trivially emit a single value randomly from the choices. Which
+            # means we need to compile all of the choices during compile time,
+            # and have the closure call one randomly when it is invoked.
             case {"anyOf": [*choices], **rest}:
                 closures = [compile(choice) for choice in choices]
                 return lambda: random.choice(closures)()
@@ -62,6 +82,11 @@ def make_generator(
                 closures = [compile({"type": choice, **rest}) for choice in choices]
                 return lambda: random.choice(closures)()
 
+            # Compound entities:
+            #     "type": "object" | "array"
+            #
+            # Our closure needs to construct the correct entity when called,
+            # so we compile the subschemas, and generate the dic/list.
             case {"type": "object", **rest}:
                 prop_closures = {
                     key: compile(sub_schema)
