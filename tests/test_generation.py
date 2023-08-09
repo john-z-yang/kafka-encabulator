@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from src.generator import make_generator
+from src.generator.generator import make_generator
 
 SCHEMA_FILES = [
     "events.v1.schema.json",
