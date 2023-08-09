@@ -28,7 +28,6 @@ def make_generator(
         match schema:
             # Atomics:
             #     "type": ("null" | "boolean" | "integer" | "number" | "string")
-            #
             # If we match any of these, our closure simply emits a single
             # primitive, and we're done.
             case {"type": "null", **rest}:
@@ -64,7 +63,6 @@ def make_generator(
 
             # References:
             #     "$ref": definition_path
-            #
             # Trivially call the closure at the definition_path and forward
             # its result. It's imperative that we access values within
             # the definitions dict during run-time instead of compile-time,
@@ -74,9 +72,8 @@ def make_generator(
                 return lambda: definitions[definition_path]()
 
             # Boolean algebraics:
-            #     "anyOf": [ typename* ]
-            #     "type": [ typename* ]
-            #
+            #     "anyOf": [ subschema* ]
+            #     "type": [ subschema* ]
             # Emit a single value randomly from the choices. This means we need
             # to compile all of the choices during compile time, and have the
             # closure call one randomly when it is invoked.
@@ -144,7 +141,6 @@ def make_generator(
 
             # Default value:
             #     "default": value
-            #
             # We're not able to pattern match anything, so we fallback to the
             # default value if it exists. This is in the end because we want to
             # generate random values if possible.
