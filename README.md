@@ -62,11 +62,12 @@ Usage
 Usage: main.py [OPTIONS]
 
 Options:
-  --path PATH             The file path of the JSON schema (mutually exclusive
-                          with --schema).
-  --schema TEXT           The JSON schema. (mutually exclusive with --path).
+  --path PATH             File path of the JSON schema. (Mutually exclusive
+                          with --schema)
+  --schema TEXT           JSON schema. (Mutually exclusive with --path)
   --count INTEGER         Number of JSON objects to produce.
-  --kafka <TEXT TEXT>...  The kafka server and topic.
+  --seed INTEGER          Seed for the PRNG.  [default: 0]
+  --kafka <TEXT TEXT>...  Kafka server and topic.
   --help                  Show this message and exit.
 ```
 
