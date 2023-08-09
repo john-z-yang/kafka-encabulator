@@ -21,6 +21,10 @@ Python script that generates random JSONs base on JSON schema.
         {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "[0-9a-fA-F]{32}"
+            },
             "xyz": {
               "type": [ "integer", "null" ],
               "minimum": 0,
@@ -40,7 +44,7 @@ Python script that generates random JSONs base on JSON schema.
 
 ```bash
 ➜  kafka-encabulator git:(main) ✗ python src/main.py schema.json
-[2, {"xyz": 8}, false]
+[2, {"id": "AB6f1b6A2BECfBbaBa3d35cd73dA7952", "xyz": 3}, false]
 ```
 
 ## Getting Started
