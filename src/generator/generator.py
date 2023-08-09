@@ -72,8 +72,8 @@ def make_generator(
                 return lambda: definitions[definition_path]()
 
             # Boolean algebraics:
-            #     "anyOf": [ subschema* ]
-            #     "type": [ subschema* ]
+            #     "anyOf": [ sub_schema* ]
+            #     "type": [ sub_schema* ]
             # Emit a single value randomly from the choices. This means we need
             # to compile all of the choices during compile time, and have the
             # closure call one randomly when it is invoked.
@@ -96,7 +96,7 @@ def make_generator(
             #       ...
             #     }
             # Our closure needs to construct the correct entity when called, so
-            # we compile the subschemas into closures, and generate the dic/list
+            # we compile the sub-schemas into closures, and generate the dic/list
             # by calling them.
             case {"type": "object", **rest}:
                 prop_closures = {
