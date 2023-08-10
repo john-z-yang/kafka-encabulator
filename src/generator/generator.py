@@ -15,7 +15,8 @@ def make_generator(
     num_max_val=1 << 16,
     float_min_val=0,
     float_max_val=1 << 16,
-    str_len=8,
+    str_min_len=2,
+    str_max_len=16,
     definitions={},
 ):
     def load_definitions(schema):
@@ -52,7 +53,10 @@ def make_generator(
                         return lambda: random.choice(enums)
                     case _:
                         return lambda: "".join(
-                            random.choices(string.ascii_uppercase, k=str_len)
+                            random.choices(
+                                string.ascii_letters,
+                                k=random.randint(str_min_len, str_max_len),
+                            )
                         )
 
             # Constants:

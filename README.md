@@ -62,13 +62,22 @@ Usage
 Usage: main.py [OPTIONS]
 
 Options:
-  --path PATH             File path of the JSON schema. (Mutually exclusive
-                          with --schema)
-  --schema TEXT           JSON schema. (Mutually exclusive with --path)
-  --count INTEGER         Number of JSON objects to produce.
-  --seed INTEGER          Seed for the PRNG.  [default: 0]
-  --kafka <TEXT TEXT>...  Kafka server and topic.
-  --help                  Show this message and exit.
+  --path PATH                     File path of the JSON schema. (Mutually
+                                  exclusive with --schema)
+  --schema TEXT                   JSON schema. (Mutually exclusive with
+                                  --path)
+  --count INTEGER                 Number of JSON objects to produce.
+  --seed TEXT                     Seed for the PRNG.
+  --arr-len <INTEGER INTEGER>...  Min and max number of elements for the
+                                  arrays.  [default: 0, 32]
+  --int <INTEGER INTEGER>...      Min and max values for integers.  [default:
+                                  0, 65536]
+  --float <FLOAT FLOAT>...        Min and max values for floating points.
+                                  [default: 0, 65536]
+  --str-len <INTEGER INTEGER>...  Min and max length for strings.  [default:
+                                  2, 16]
+  --kafka <TEXT TEXT>...          Kafka server and topic.
+  --help                          Show this message and exit.
 ```
 
 Top-level Makefile synopsis
