@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+import time
 
 import click
 import confluent_kafka
@@ -9,11 +10,12 @@ from cli.mutex import Mutex
 from generator.generator import make_generator
 
 
-def generate(generator, count, produce):
+def generate(generator, count, produce, interval):
     try:
         for i in range(count):
             msg = generator()
             produce(json.dumps(msg))
+            time.sleep(interval / 1000)
     except KeyboardInterrupt:
         logging.error(f"Caught KeyboardInterrupt: {i} messages produced, stopping now")
 
@@ -68,6 +70,12 @@ def generate(generator, count, produce):
     show_default=True,
     help="Min and max length for strings.",
 )
+@click.option(
+    "--interval",
+    default=0,
+    show_default=True,
+    help="The interval (in ms) between each JSON.",
+)
 @click.option("--kafka", type=(str, str), help="Kafka server and topic.")
 def main(
     schema_path,
@@ -78,6 +86,7 @@ def main(
     int_range,
     float_range,
     str_len_range,
+    interval,
     kafka,
 ):
     if schema_path:
@@ -109,11 +118,11 @@ def main(
         server, topic = kafka
         kafka_producer = confluent_kafka.Producer({"bootstrap.servers": server})
         produce = lambda json: kafka_producer.produce(topic, json)
-        generate(generator, count, produce)
+        generate(generator, count, produce, interval)
         kafka_producer.flush()
     else:
         produce = lambda json: print(json)
-        generate(generator, count, produce)
+        generate(generator, count, produce, interval)
 
 
 if __name__ == "__main__":
