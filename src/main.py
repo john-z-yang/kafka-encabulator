@@ -23,17 +23,15 @@ def generate(generator, count, produce, interval):
 @click.command()
 @click.option(
     "--path",
-    "schema_path",
     type=click.Path(exists=True),
     cls=Mutex,
-    not_required_if=["schema_str"],
+    not_required_if=["schema"],
     help="File path of the JSON schema.",
 )
 @click.option(
     "--schema",
-    "schema_str",
     cls=Mutex,
-    not_required_if=["schema_path"],
+    not_required_if=["path"],
     help="JSON schema.",
 )
 @click.option("--count", default=1, help="Number of JSON objects to produce.")
@@ -78,8 +76,8 @@ def generate(generator, count, produce, interval):
 )
 @click.option("--kafka", type=(str, str), help="Kafka server and topic.")
 def main(
-    schema_path,
-    schema_str,
+    path,
+    schema,
     count,
     seed,
     arr_len_range,
@@ -89,14 +87,14 @@ def main(
     interval,
     kafka,
 ):
-    if not schema_path and not schema_str:
+    if not path and not schema:
         click.echo(click.get_current_context().get_help())
         return
-    if schema_path:
-        with open(schema_path) as f:
+    if path:
+        with open(path) as f:
             top_lvl_schema = json.loads(f.read())
-    if schema_str:
-        top_lvl_schema = json.loads(schema_str)
+    if schema:
+        top_lvl_schema = json.loads(schema)
 
     random.seed(seed)
 
